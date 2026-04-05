@@ -5,13 +5,23 @@ name: ChatBot Dev CI/CD
 # main 브랜치에 push하면 CI/CD 실행
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
-
+    branches:
+      - main
 # 작업 환경 설정
-jops:
-  # build: job 내의 하나의 작업
-  build:
+jobs:
+  Deploy:
     runs-on: ubuntu-latest # 해당 환경을 실행할 운영체제 지정
     steps:
-      - name: 빌드 결과물 가져오기
+      - name: SSH로 EC2에 원격 접속
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{secrets.EC2_HOST}}
+          username: ${{secrets.EC2_USERNAME}}
+          key: ${{secrets.EC2_PRIVATE_KEY}}
+          script_stop: true
+          script: |
+            cd /home/ubuntu/NoticeChatbot
+            git pull origin main
+            ./gradlew clean build 
+            sudo fuser -f -n tcp 8080 || true
+            nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
