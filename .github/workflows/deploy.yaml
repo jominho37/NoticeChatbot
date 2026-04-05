@@ -1,0 +1,17 @@
+# 이름 설정
+name: ChatBot Dev CI/CD
+
+# on: 실행 트리거 역할 : 언제 이 작업을 수행할 것인가
+# main 브랜치에 push하면 CI/CD 실행
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+# 작업 환경 설정
+jops:
+  # build: job 내의 하나의 작업
+  build:
+    runs-on: ubuntu-latest # 해당 환경을 실행할 운영체제 지정
+    steps:
+      - name: 빌드 결과물 가져오기
